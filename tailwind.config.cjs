@@ -3,7 +3,12 @@ module.exports = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   prefix: 'tw-',
   theme: {
-    extend: {},
+    extend: {
+      minHeight: {
+        '50-screen': '50vh',
+        '80-screen': '80vh',
+      },
+    },
   },
   plugins: [],
 }
