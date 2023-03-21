@@ -9,8 +9,88 @@ datasource db {
   provider = "sqlite"
   url      = "file:./dev.sqlite"
 }
-model Article {
-  id Int @id @default(autoincrement())
-  title String
-  content String
+model User {
+  id        String    @id @unique
+  name      String
+  username  String @unique
+  session   Session[]
+  Key       Key[]
+  polls     Poll[]
+  user_poll_items UserPollItem[]
+  user_polls      UserPoll[]
+
+  @@map("user")
+}
+model Session {
+  id             String @id @unique
+  user_id        String
+  active_expires BigInt
+  idle_expires   BigInt
+  user           User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("session")
+}
+model Key {
+  id              String  @id @unique
+  hashed_password String?
+  user_id         String
+  primary         Boolean
+  expires         BigInt?
+  user            User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("key")
+}
+
+model Poll {
+  id              Int @id @default(autoincrement())
+  name            String
+  description     String?
+  tag             String
+  type            String?
+  is_deleted      Boolean @default(false)
+  poll_items      PollItem[]
+  user_polls      UserPoll[]
+  user            User?    @relation(references: [id], fields: [user_id])
+  user_id         String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+  time_end        DateTime? 
+
+  @@map("poll")
+}
+
+model PollItem {
+  id              Int @id @default(autoincrement())
+  name            String
+  poll            Poll? @relation(references: [id], fields: [poll_id])
+  poll_id         Int
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+  user_poll_items UserPollItem[]
+
+  // @@index([poll_id])
+  @@map("poll_item")
+}
+
+model UserPollItem {
+
+  id              Int @id @default(autoincrement())
+  poll_item       PollItem? @relation(references: [id], fields: [poll_item_id])
+  poll_item_id    Int
+  user            User?    @relation(references: [id], fields: [user_id])
+  user_id         String
+
+  @@map("user_poll_item")
+}
+
+model UserPoll {
+  id              Int @id @default(autoincrement())
+  poll            Poll? @relation(references: [id], fields: [poll_id])
+  poll_id         Int
+  user            User?    @relation(references: [id], fields: [user_id])
+  user_id         String
+
+  @@map("user_poll")
 }
