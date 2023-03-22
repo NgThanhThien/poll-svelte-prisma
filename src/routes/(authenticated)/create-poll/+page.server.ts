@@ -15,18 +15,20 @@ export const actions: Actions = {
 		if (!(user && session)) {
 			throw redirect(302, '/');
 		}
-		let data;
-		const { name, description, type, tag, time_end } = Object.fromEntries(
-			await request.formData()
-		) as {
-			name: string;
-			description: string;
-			type: string;
-			tag: string;
-			time_end: string;
-		};
+		const { name, description, type, tag, time_end, item_1, item_2, item_3, item_4 } =
+			Object.fromEntries(await request.formData()) as {
+				name: string;
+				description: string;
+				type: string;
+				tag: string;
+				time_end: string;
+				item_1: string;
+				item_2: string;
+				item_3: string;
+				item_4: string;
+			};
 		try {
-			data = await __prisma.poll.create({
+			let data = await __prisma.poll.create({
 				data: {
 					name,
 					description,
@@ -36,29 +38,21 @@ export const actions: Actions = {
 					time_end: new Date(time_end)
 				}
 			});
+			if (data.id) {
+				[item_1, item_2, item_3, item_4].forEach(async (v) => {
+					if (v)
+						await __prisma.pollItem.create({
+							data: {
+								name: v + '',
+								poll_id: Number(data.id)
+							}
+						});
+				});
+			}
 		} catch (error) {
 			console.error(error);
 			return fail(500, { message: 'Could not create the poll' });
 		}
-		console.log('data', data);
-		return;
-		// throw redirect(302);
+		throw redirect(302, `/`);
 	}
-	// deleteArticle: async ({url}) => {
-	//   const id = url.searchParams.get('id');
-	//   if(!id) return fail(400,{message: 'Invalid request'})
-	//   try {
-	//     await prisma.article.delete({
-	//       where: {
-	//         id: Number(id)
-	//       }
-	//     })
-	//   } catch (error) {
-	//     console.error(error);
-	//     fail(500, { message: 'Could not delete the article'})
-	//   }
-	//   return {
-	//     status:200
-	//   }
-	// }
 };

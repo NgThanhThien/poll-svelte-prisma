@@ -4,7 +4,11 @@ import type { Actions, PageServerLoad } from './(unauthenticated)/$types';
 
 export const load: PageServerLoad = async () => {
 	return {
-		polls: await prisma.poll.findMany()
+		polls: await prisma.poll.findMany({
+			include: {
+				poll_items: true
+			}
+		})
 	};
 };
 // export const actions: Actions = {
