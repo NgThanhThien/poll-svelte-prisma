@@ -4,9 +4,6 @@
   import type { PollModel } from "../../model/Poll";
 	import type { PollItemModel } from "../../model/PollItem";
 
-  interface Poll extends PollModel {
-    poll_items: PollItemModel[];
-  }
   let selected: number
   export let poll: any
   export let isAuth:boolean = false;

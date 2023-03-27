@@ -8,6 +8,13 @@ export const POST: RequestHandler = async({request,locals}) => {
   const {user} = await locals.validateUser()
   if(!session && !user) throw redirect(302,"/")
   const data = Object.fromEntries(await request.formData()) as {pollId: string, pollItemId: string}
+  const vote = await __prisma.userPoll.findMany({
+    where:{
+      poll_id: Number(data.pollId), 
+      user_id: user.userId
+    }
+  })
+  if(!!vote.length) throw redirect(302,"/")
   try {
     await __prisma.userPoll.create({
       data: {

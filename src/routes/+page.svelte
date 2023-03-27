@@ -1,30 +1,30 @@
 <script lang="ts">
+	import Pagination from '../component/Pagination.svelte';
 	// import { fade, scale } from 'svelte/types/runtime/transition';
 	// import { flip } from 'svelte/animate';
 	import PollItem from '../component/PollComponent/PollItem.svelte';
 	import type { PollModel } from '../model/Poll';
 	import type { PollItemModel } from '../model/PollItem';
 	import type { PageData } from './$types';
+
 	interface PollItem extends PollItemModel {
 		_count: {
 			user_poll_items: number
 		};
 	}
 	interface Poll extends PollModel {
-		poll_items :     PollItem[],
+		poll_items :  PollItem[],
 		// _count
 	}
 	export let data: PageData;
 	
 	$: ({polls, user} = data)
-	$: _p = [...polls].map(p => {
+	$: _p = [...polls.data].map(p => {
 		return {
 			...p,
 			totalVote: totalVote(p as any)
 		}
 	})
-	$: console.log(_p)
-
 	const vote= async (e:CustomEvent) => {
 		if(e.detail) {
 			let data = {
@@ -48,5 +48,11 @@
 		{#each _p as poll(poll.id)}
 				<PollItem isAuth={!!user} poll={poll} on:vote={vote}/>
 		{/each}
+		
 	</div>
+	{#if polls.totalPage > 1}
+		<div class="tw-pb-10 tw-flex tw-justify-center">
+			<Pagination currentPage={polls.currentPage} totalPage={polls.totalPage} />
+		</div>
+	{/if}
 </div>
